@@ -1,0 +1,3 @@
+[submodule ".git-submodules/clubhouse"]
+	path = .git-submodules/clubhouse
+	url = https://github.com/holycharisma/clubhouse

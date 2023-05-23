@@ -1,0 +1,42 @@
+{
+  "author": "orpheus <orpheus@computerdream.club>",
+  "name": "hcc-client",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "rimraf dist pkg && webpack",
+    "start": "rimraf dist pkg && webpack serve --port 8000",
+    "watch": "rimraf dist pkg && webpack watch",
+    "test": "cargo test && wasm-pack test --headless"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21",
+    "@babel/preset-env": "^7.21",
+    "@tailwindcss/forms": "^0.5.3",
+    "@wasm-tool/wasm-pack-plugin": "^1.7",
+
+    "babel-loader": "^9.1",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.7",
+    "howler": "^2.2",
+    "html-webpack-plugin": "^5.5",
+    "htmx.org": "^1.9",
+
+    "postcss": "^8.4",
+    "postcss-loader": "^7.3",
+    "postcss-preset-env": "^8.4",
+    "postcss-import": "^15.1",
+
+    "style-loader": "^3.3",
+    "tailwindcss": "^3.3",
+
+    "rimraf": "^5.0.1",
+
+    "webpack": "^5.83",
+
+    "webpack-assets-manifest": "^5.1",
+
+    "webpack-cli": "^5.1",
+    "webpack-dev-server": "^4.15",
+    "webpack-subresource-integrity": "^5.2.0-rc.1"
+  }
+}

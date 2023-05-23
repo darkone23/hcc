@@ -1,0 +1,143 @@
+    <!-- Banner image. Just remove it if you don’t want any -->
+    <img class="banner" src="images/banner.jpg" alt="" />
+
+    <main>
+      <header>
+        <!-- Add your avatar picture’s URL in the src attribute -->
+        <img class="avatar" src="images/shakespeare.jpg" alt="" />
+
+        <!-- Change this to the title you want -->
+        <h1>William Shakespeare</h1>
+
+        <!-- A short bio, quote, or whatever you want -->
+        <p class="bio">
+          “If there really is such a thing as turning in one’s grave,
+          Shakespeare must get a lot of exercise.” ―George Orwell
+        </p>
+      </header>
+
+      <ul class="social-links">
+        <!--
+        Icon links (one <li> for each icon).
+        Use <ion-icon> to use an icon from the ionicon collection
+        (see here for a list: https://ionic.io/ionicons).
+        Or use your own icon.
+      -->
+        <li>
+          <a href="#">
+            <ion-icon name="logo-instagram"></ion-icon>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <ion-icon name="logo-twitter"></ion-icon>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <ion-icon name="logo-tiktok"></ion-icon>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <ion-icon name="logo-youtube"></ion-icon>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <ion-icon name="logo-amazon"></ion-icon>
+          </a>
+        </li>
+      </ul>
+
+      <table class="books">
+        <tbody>
+          <!--
+          Your books (one <tr> for each book).
+          Note: the reason this template uses a <table> is that it allows to align
+          the content better when having several books.
+        -->
+          <tr>
+            <td>
+              <!--
+              Tweak the parameters you pass to <book-3d-cover> to adjust to your book settings:
+                - rotate: Rotation of the book, in degrees. Default: 30
+                - rotate-hover: Rotation of the book on hover, in degrees. Default: 5
+                - perspective: Perspective value seems to be a realistic value. Default: 600
+                - transitionD-duration: Duration of rotate animation, in milliseconds. Default: 1
+                - radius: Radius of right corners, in pixels. Default: 2
+                - thickness: Book thickness, in pixels. Default: 50
+                - bg-color string Color of the inside of back cover . Default: #01060f
+                - width: Width of the book, in pixels. Default: 200
+                - height: Height of the book, in pixels. Default: 300
+                - pages-offset: Offset between the pages and the cover size, in pixels. Default: 3
+            -->
+              <book-3d-cover thickness="15" pages-offset="2">
+                <!-- Put the cover URL in the src attribute, and don’t forget to set the image size (width and/or height). -->
+                <img src="images/cover.jpg" width="96" />
+              </book-3d-cover>
+            </td>
+            <td>
+              <div>
+                <!-- The book title -->
+                <h2>Hamlet</h2>
+
+                <!-- A short book outline -->
+                <p class="description">
+                  The Tragedy of Hamlet, Prince of Denmark
+                </p>
+              </div>
+              <div class="buttons">
+                <!-- Book links (one <a> for each link)-->
+                <a href="#">
+                  <span>Gumroad</span>
+                </a>
+                <a href="#">
+                  <span>Amazon</span>
+                </a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ul class="links">
+        <!-- Your links (one <a> for each link) -->
+        <li>
+          <a href="#">
+            <span>Get signed copies of my new book</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <span>1link rocks 🤟</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <span>Romeo &amp; Juliette Review</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <span>Theatre Tickets</span>
+          </a>
+        </li>
+      </ul>
+    </main>
+
+    <!-- These are the necessary scripts to use Ionicons -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+
+

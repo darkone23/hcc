@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Holy Charisma</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com?plugins=typography,aspect-ratio,line-clamp"></script>    
+  <style>
+
+body {
+  /* Set the page background here */
+  
+  background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
+  --tw-gradient-from: #5172c1;
+  --tw-gradient-to: rgb(200 165 165);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+  /* Try these background: */
+  /* @apply bg-lime-100; */
+  /* @apply bg-gradient-to-b from-blue-600 via-pink-600 to-orange-600; */
+  /* Set the page text color here. Depending on the page background, you might need
+     to use a dark text color, such as text-black or text-gray-900. */
+    --tw-text-opacity: 1;
+    color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.social-links a {
+  /* Set the icon links color here. By default, they’ll have the same color as the text. */
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.links a, .books .buttons a {
+  /* Customize the button style here */
+  border-radius: 1.5rem;
+  border-color: rgb(255 255 255 / var(--tw-border-opacity));
+  --tw-border-opacity: 0.8;
+  /* Try these styles: */
+  /* @apply rounded bg-cyan-900 border-transparent; */
+  /* @apply rounded-lg text-black border-black; */
+}
+
+.books tr > td {
+  /* Customize the background of book cards here */
+  /* @apply bg-white bg-opacity-30; */
+  /* Try a darker background: */
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+  --tw-bg-opacity: 0.2;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+}
+
+main > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(2rem * var(--tw-space-y-reverse));
+}
+
+main {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 2rem;
+}
+
+@media (min-width: 640px) {
+  main {
+    padding-top: 3rem;
+  }
+}
+
+@media (min-width: 768px) {
+  main {
+    padding-top: 4rem;
+  }
+}
+
+
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+header > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+}
+
+header {
+  text-align: center;
+}
+
+h1 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+}
+
+.avatar {
+  z-index: 20;
+  height: 6rem;
+  width: 6rem;
+  border-radius: 9999px;
+  --tw-drop-shadow: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.bio {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .social-links > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+}
+
+.social-links a {
+  margin-bottom: 0.5rem;
+  display: flex;
+  height: 2rem;
+  width: 3rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.social-links a:hover {
+  --tw-scale-x: 1.25;
+  --tw-scale-y: 1.25;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.links {
+  display: flex;
+  width: 18rem;
+  min-width: -webkit-fit-content;
+  min-width: -moz-fit-content;
+  min-width: fit-content;
+  flex-direction: column;
+}
+
+.links > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+}
+
+.links a {
+  display: flex;
+  justify-content: center;
+  border-width: 1px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  text-align: center;
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.links a:hover {
+  --tw-scale-x: 1.05;
+  --tw-scale-y: 1.05;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.books {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  max-width: 48rem;
+  border-collapse: separate;
+  --tw-border-spacing-y: 0.5rem;
+  border-spacing: var(--tw-border-spacing-x) var(--tw-border-spacing-y);
+}
+
+.books tr {
+  display: flex;
+}
+
+.books tr > td {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  vertical-align: middle;
+}
+
+.books tr > td:first-child {
+  flex-shrink: 0;
+  border-top-left-radius: 1.5rem;
+  border-bottom-left-radius: 1.5rem;
+}
+
+.books tr > td:last-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.books tr > td:last-child > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
+}
+
+.books tr > td:last-child {
+  border-top-right-radius: 1.5rem;
+  border-bottom-right-radius: 1.5rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .books tr > td:last-child {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+.books h2 {
+  font-weight: 700;
+}
+
+.books .description {
+  font-size: 0.875rem;
+  font-style: italic;
+  line-height: 1.25rem;
+  opacity: 0.8;
+}
+
+.books .buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.books .buttons a {
+  margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.books .buttons a > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.books .buttons a {
+  border-width: 1px;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.books .buttons a:hover {
+  --tw-scale-x: 1.05;
+  --tw-scale-y: 1.05;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+@media (min-width: 640px) {
+  .books .buttons a {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .books .buttons a {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
+
+.hover\:scale-105:hover {
+  --tw-scale-x: 1.05;
+  --tw-scale-y: 1.05;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+@media (min-width: 640px) {
+  .sm\:px-3 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .sm\:pt-12 {
+    padding-top: 3rem;
+  }
+
+  .sm\:text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .md\:mx-4 {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  .md\:mt-4 {
+    margin-top: 1rem;
+  }
+
+  .md\:rounded-xl {
+    border-radius: 0.75rem;
+  }
+
+  .md\:px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .md\:text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}  </style>
+</head>
+<body>
+
+    <main>
+      <header>
+        <!-- Add your avatar picture’s URL in the src attribute -->
+        <img class="avatar" src="https://cloud.bunny.holycharisma.com/look-two-smaller.png" alt="abstract logo"/>
+
+        <!-- Change this to the title you want -->
+        <h1>Holy Charisma</h1>
+
+        <!-- A short bio, quote, or whatever you want -->
+        <p class="bio">
+          "The Friend Song" out now!
+        </p>
+      </header>
+
+      <ul class="social-links">
+        <!--
+        Icon links (one <li> for each icon).
+        Use <ion-icon> to use an icon from the ionicon collection
+        (see here for a list: https://ionic.io/ionicons).
+        Or use your own icon.
+      -->
+        <li>
+          <a href="https://holycharisma.com/promo">
+            <ion-icon name="link"></ion-icon>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.instagram.com/holy.charisma">
+            <ion-icon name="logo-instagram"></ion-icon>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.twitch.tv/holycharisma">
+            <ion-icon name="logo-twitch"></ion-icon>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.tiktok.com/@holy.charisma">
+            <ion-icon name="logo-tiktok"></ion-icon>
+          </a>
+        </li>
+        <li>
+          <a href="https://soundcloud.com/holycharisma">
+            <ion-icon name="logo-soundcloud"></ion-icon>
+          </a>
+        </li>
+      </ul>
+
+      <table class="books">
+        <tbody>
+          <tr>
+            <td>
+              <book-3d-cover thickness="15" pages-offset="2">
+                <img src="https://cloud.bunny.holycharisma.com/the-friends-song-small.png" width="96" />
+              </book-3d-cover>
+            </td>
+            <td>
+              <div>
+                <h2>Holy Charisma</h2>
+
+                <!-- A short book outline -->
+                <p class="description">
+                  The Friend Song
+                </p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+
+      <ul class="links">
+        <!-- Your links (one <a> for each link) -->
+        <div class="text-center text-2xl">
+          <p>Stream now</p>
+        </div>
+        <li>
+          <a href="https://holycharisma.bandcamp.com/track/the-friend-song">
+            <span>Bandcamp</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://music.apple.com/us/album/the-friend-song-single/1664311217">
+            <span>Apple Music</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://open.spotify.com/album/1ABxsUcdNUFtfmAaxBfVa8">
+            <span>Spotify</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://youtu.be/SZRBdNw2aWI">
+            <span>YouTube</span>
+          </a>
+        </li>
+      </ul>
+    </main>
+
+    <!-- These are the necessary scripts to use Ionicons -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"
+    ></script>
+
+</body>
+</html>

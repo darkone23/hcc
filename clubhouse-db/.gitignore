@@ -1,0 +1,7 @@
+db/
+result/
+.direnv/
+target/
+.env
+.secrets
+.DS_STORE

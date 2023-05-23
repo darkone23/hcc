@@ -11,3 +11,15 @@ project goals:
 - patronage infrastructure
 - cryptographic community ownership 
     - donations vs purchase
+
+how to build?
+
+supported operating systems:
+- linux x86_64
+
+primary build tools:
+- nix flakes
+
+optional build tools:
+- just
+- nix-direnv

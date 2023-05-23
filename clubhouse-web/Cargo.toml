@@ -1,0 +1,60 @@
+# You must change these to your own details.
+[package]
+name = "hcc-client"
+version = "0.2.0"
+authors = ["orpheus <orpheus@computerdream.club>"]
+categories = ["wasm"]
+readme = "README.md"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+# This makes the compiled code faster and smaller, but it makes compiling slower,
+# so it's only enabled in release mode.
+lto = true
+
+[features]
+# If you uncomment this line, it will enable `wee_alloc`:
+#default = ["wee_alloc"]
+
+[dependencies]
+clubhouse-core = { path = "../clubhouse-core" }
+orion = "0.17.2"
+base64 = "0.13.1"
+# The `wasm-bindgen` crate provides the bare minimum functionality needed
+# to interact with JavaScript.
+wasm-bindgen = "0.2.86"
+wasm-logger = "0.2.0"
+yew = "0.20.0"
+# bounce = "0.2"
+yew-hooks = "0.2.0"
+# gloo = "0.6.0"
+
+gloo-events = "0.1.2"
+gloo-render = "0.1.1"
+gloo-utils = "0.1.6"
+# gloo-console = "0.2.3"
+
+serde = { version = "1.0.163", features = ["derive"] }
+serde-wasm-bindgen = { version = "0.5.0" }
+
+lazy_static = "1.4.0"
+getrandom = { version = "0.2.9", features = ["js"] }
+
+# The `web-sys` crate allows you to interact with the various browser APIs,
+# like the DOM.
+[dependencies.web-sys]
+version = "0.3.63"
+features = ["CustomEvent"]
+# features = ["console"]
+# , "IntersectionObserver"]
+
+# These crates are used for running unit tests.
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.36"
+futures = "0.3.25"
+wasm-bindgen-futures = "0.4.36"
+js-sys = "0.3.63"
