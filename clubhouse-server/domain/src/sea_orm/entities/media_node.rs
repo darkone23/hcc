@@ -5,12 +5,8 @@ use sea_orm::entity::prelude::*;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
 #[sea_orm(table_name = "media_node")]
 pub struct Model {
-    #[sea_orm(
-        primary_key,
-        auto_increment = false,
-        column_type = "Binary(BlobSize::Blob(None))"
-    )]
-    pub id: Vec<u8>,
+    #[sea_orm(primary_key)]
+    pub id: i32,
     pub media_slug: String,
     pub medium_type: i32,
     pub sort_key: i32,

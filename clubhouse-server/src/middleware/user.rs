@@ -25,7 +25,7 @@ impl tide::Middleware<ServerWiring> for UserExtensionMiddleware {
 
         let maybe_user: Option<SessionUser> = req.session().get("user");
 
-        let auth_token = 
+        let auth_token = // base64_websafe jwt claims
             if maybe_user.is_some() {
                 let user = maybe_user.unwrap();
                 let maybe_user = req.state().services.jwt_util.sign_auth_token(&user.email);
@@ -39,11 +39,22 @@ impl tide::Middleware<ServerWiring> for UserExtensionMiddleware {
             };
 
         if auth_token.is_some() {
-            let secrets: &clubhouse_core::encryption::SharedKeyring = req.ext().unwrap();
-            let encrypted = secrets.encrypt_broadcast_base64(&auth_token.unwrap()).await.unwrap();
+            let secrets: &clubhouse_core::shapes::ClientServerKeyring = req.ext().unwrap();
+
+            let jwt_claims = auth_token.unwrap();
+
+            let encrypted = clubhouse_core::encryption::EmojiCrypt::encrypt_base64websafe_server(
+                secrets, 
+                jwt_claims.as_bytes()
+            ).encrypted_message;
+
             let mut res = next.run(req).await;
-            res.insert_header("x-auth-token", encrypted.message);
+            res.insert_header("x-auth-token", encrypted);
+
             Ok(res)
+
+
+            
         } else {
             Ok(next.run(req).await)
         }

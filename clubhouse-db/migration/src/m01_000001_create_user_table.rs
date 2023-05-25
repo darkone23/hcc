@@ -25,7 +25,7 @@ impl MigrationTrait for Migration {
         // we use hash as companion for our unique / index searchable keys
         let sql = "\
         CREATE TABLE user_email_password ( \
-            id serial NOT NULL PRIMARY KEY, \
+            id integer NOT NULL PRIMARY KEY AUTOINCREMENT, \
             email varchar NOT NULL, \
             email_hash varchar NOT NULL UNIQUE, \
             password varchar NOT NULL, \

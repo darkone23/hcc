@@ -15,7 +15,7 @@ impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let sql = "\
         CREATE TABLE user_attributes ( \
-            id serial NOT NULL PRIMARY KEY, \
+            id integer NOT NULL PRIMARY KEY AUTOINCREMENT, \
             uid integer NOT NULL REFERENCES user_email_password (id), \
             display varchar NOT NULL UNIQUE, \
             created_at timestamp with time zone NOT NULL, \

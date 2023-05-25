@@ -1,3 +1,5 @@
+use clubhouse_core::shapes::{ClientServerKeyring, SenderType, EmojiCryptCodec};
+use clubhouse_core::encryption::EmojiCrypt;
 use tide::prelude::*;
 use tide::{http::mime, Redirect, Request, Response, Result};
 
@@ -5,8 +7,6 @@ use crate::dao;
 use crate::util::password::PasswordUtil;
 use crate::wiring::ServerWiring;
 
-use crate::util::encryption;
-use clubhouse_core::encryption::{UserEncryptedEmojiMessage, DeterministicEmojiEncrypt};
 use clubhouse_core::emoji;
 
 use domain::session::SessionUser;
@@ -24,13 +24,11 @@ pub async fn get(req: Request<ServerWiring>) -> Result {
         Ok(Redirect::new("/app").into())
     } else {
         let login_get_view = LoginGetView {};
-        let secrets: &encryption::ServerKeyring = req.ext().unwrap();
+        let message = login_get_view.render().unwrap();
 
-        let encrypted_body = secrets
-            .encrypt_broadcast_emoji(&login_get_view.render().unwrap())
-            .await
-            .unwrap()
-            .message;
+        let secrets: &ClientServerKeyring = req.ext().unwrap();
+        let encrypted_body = 
+            EmojiCrypt::encrypt_emoji_server(secrets, message.as_bytes()).encrypted_message;
 
         let response = Response::builder(200)
             .content_type(mime::HTML)
@@ -50,23 +48,18 @@ pub async fn post(mut req: Request<ServerWiring>) -> Result {
     let form = {
         let encrypted_form: UserLoginDto = req.body_form().await?;
 
-        let secrets: &encryption::ServerKeyring = req.ext().unwrap();
+        let secrets: &ClientServerKeyring = req.ext().unwrap();
 
-        let sender = &secrets.user;
+        let decrypted_email = EmojiCrypt::decrypt(secrets, &encrypted_form.email, EmojiCryptCodec::EmojiEncoded, SenderType::Client);
 
-        let encrypted_email = UserEncryptedEmojiMessage {
-            sender: sender.to_owned(),
-            message: encrypted_form.email,
-        };
+        let decrypted_password = EmojiCrypt::decrypt(secrets, &encrypted_form.password, EmojiCryptCodec::EmojiEncoded, SenderType::Client);
 
-        let encrypted_password = UserEncryptedEmojiMessage {
-            sender: sender.to_owned(),
-            message: encrypted_form.password,
-        };
+        let decrypted_email = String::from_utf8(decrypted_email).unwrap();
+        let decrypted_password = String::from_utf8(decrypted_password).unwrap(); // todo: send a blake hash or something instead
 
         UserLoginDto {
-            email: encrypted_email.decrypt(&secrets.user_secret).unwrap(),
-            password: encrypted_password.decrypt(&secrets.user_secret).unwrap(),
+            email: decrypted_email,
+            password: decrypted_password,
         }
     };
 
@@ -85,16 +78,16 @@ pub async fn post(mut req: Request<ServerWiring>) -> Result {
         let user_pwhash = emoji::decode(&u.password);
         let expected_email_hash = u.email_hash;
 
-        let form_email_hash = {
-            DeterministicEmojiEncrypt::new(
-                &req.state().config.encryption_key_emoji,
-                &req.state().config.encryption_salt_emoji,
-                plaintext_email.to_owned(),
-            )
-        }
-        .unwrap();
+        let form_email_hash: &str = {
+            // DeterministicEmojiEncrypt::new(
+            //     &req.state().config.encryption_key_emoji,
+            //     &req.state().config.encryption_salt_emoji,
+            //     plaintext_email.to_owned(),
+            // )
+            todo!()
+        };
 
-        let email_is_valid = form_email_hash.encrypted == expected_email_hash;
+        let email_is_valid = form_email_hash == expected_email_hash;
 
         let pass_is_valid =
             email_is_valid && { PasswordUtil::verify_hashed_bytes(&form.password, &user_pwhash) };

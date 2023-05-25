@@ -1,7 +1,7 @@
+use clubhouse_core::{encryption::EmojiCrypt, shapes::{ClientServerKeyring, EmojiCryptCodec, SenderType}};
 use tide::http::Method;
 
 use crate::wiring::ServerWiring;
-use crate::util::encryption::ServerKeyring;
 
 #[derive(Default)]
 pub struct AntiRequestForgeryMiddleware {}
@@ -37,11 +37,18 @@ impl tide::Middleware<ServerWiring> for AntiRequestForgeryMiddleware {
                 if maybe_token_text.is_some() {
                     let jwt_util = &req.state().services.jwt_util;
                     let session = req.session();
-                    let secrets: &ServerKeyring = req.ext().unwrap();
+                    let secrets: &ClientServerKeyring = req.ext().unwrap();
+
+                    let encoded_bytes = maybe_token_text.unwrap().as_str();
+
+                    let decrypted_bytes =
+                         EmojiCrypt::decrypt(secrets, encoded_bytes, EmojiCryptCodec::Base64Websafe, SenderType::Client);
+                    let jwt_claims =
+                        &String::from_utf8(decrypted_bytes).unwrap();
+
                     let verification = jwt_util.verify_csrf_token(
-                        maybe_token_text.unwrap().as_str(), 
+                        jwt_claims,
                         session.id(), 
-                        secrets
                     );
                     if verification.is_ok() {
                         Ok(next.run(req).await)

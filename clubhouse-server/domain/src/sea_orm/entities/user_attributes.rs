@@ -5,12 +5,8 @@ use sea_orm::entity::prelude::*;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
 #[sea_orm(table_name = "user_attributes")]
 pub struct Model {
-    #[sea_orm(
-        primary_key,
-        auto_increment = false,
-        column_type = "Binary(BlobSize::Blob(None))"
-    )]
-    pub id: Vec<u8>,
+    #[sea_orm(primary_key)]
+    pub id: i32,
     pub uid: i32,
     pub display: String,
     #[sea_orm(column_type = "Binary(BlobSize::Blob(None))")]

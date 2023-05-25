@@ -5,6 +5,9 @@ use domain::session::SessionUser;
 
 use askama::Template; // bring trait in scope
 
+use clubhouse_core::shapes::ClientServerKeyring;
+use clubhouse_core::encryption::EmojiCrypt;
+
 #[derive(Template)] // this will generate the code...
 #[template(path = "user/signup.html.j2")] // using the template in this path, relative
 struct SignupGetViewModel {}
@@ -17,13 +20,11 @@ pub async fn get(req: Request<ServerWiring>) -> Result {
     } else {
         let view_context = SignupGetViewModel {};
 
-        let secrets: &crate::util::encryption::ServerKeyring = req.ext().unwrap();
+        let message = view_context.render().unwrap();
+        let secrets: &ClientServerKeyring = req.ext().unwrap();
 
-        let encrypted_body = secrets
-            .encrypt_broadcast_emoji(&view_context.render().unwrap())
-            .await
-            .unwrap()
-            .message;
+        let encrypted_body = 
+            EmojiCrypt::encrypt_emoji_server(secrets, message.as_bytes()).encrypted_message;
 
         let response = Response::builder(200)
             .content_type(mime::HTML)

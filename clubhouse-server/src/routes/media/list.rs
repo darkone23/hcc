@@ -1,7 +1,8 @@
 use tide::prelude::*;
 use tide::{http::mime, Request, Response, Result};
 
-use crate::util::encryption;
+use clubhouse_core::encryption::EmojiCrypt;
+use clubhouse_core::shapes::ClientServerKeyring;
 
 use crate::wiring::ServerWiring;
 use tinytemplate::TinyTemplate;
@@ -132,12 +133,12 @@ fn render_bundle(bundle: &MediaNodeBundle) -> MediaNodeHtml {
     tt.set_default_formatter(&tinytemplate::format_unescaped);
 
     let media_json = bundle.renderer.render_json();
-    let media_json_base64 = base64::encode(media_json);
+    let media_json_base64 = clubhouse_core::base64::encode_basic(media_json.as_bytes());
 
     let media_context = MediaNodeViewModel {
         slug: bundle.slug.to_owned(),
         medium: bundle.media_type.to_string().to_ascii_lowercase(),
-        media: media_json_base64,
+        media: media_json_base64.encoded,
     };
 
     let media_html = media_context
@@ -301,13 +302,13 @@ pub async fn get(req: Request<ServerWiring>) -> Result {
         media: rendered_media,
     };
 
-    let secrets: &encryption::ServerKeyring = req.ext().unwrap();
+    let secrets: &ClientServerKeyring = req.ext().unwrap();
 
-    let encrypted_body = secrets
-        .encrypt_broadcast_emoji(&view_context.render().unwrap())
-        .await
-        .unwrap()
-        .message;
+    let encrypted_body =
+        EmojiCrypt::encrypt_emoji_server(
+            secrets,
+            &view_context.render().unwrap().as_bytes()
+        ).encrypted_message;
 
     let response = Response::builder(200)
         .content_type(mime::HTML)

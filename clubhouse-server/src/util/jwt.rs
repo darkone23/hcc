@@ -1,16 +1,9 @@
-use clubhouse_core::{
-    emoji,
-    encryption::{
-        EncryptedKeyring, UserEncryptedBase64Message, TopSecretSharedKeyring, seal_with_key,
-    },
-};
-
-use super::encryption::ServerKeyring;
-
-
+use clubhouse_core::emoji;
 use tide::prelude::*;
 
-use jsonwebtokens::{encode, Algorithm, AlgorithmID, Verifier};
+use jsonwebtokens::{Algorithm, AlgorithmID, Verifier};
+use clubhouse_core::shapes::{ClientServerKeyring, EncryptedKeyring, TopSecretSharedKeyring};
+use clubhouse_core::encryption::{EmojiCrypt, EncryptionFunctions};
 
 use orion::hazardous::hash::blake2::blake2b::Hasher;
 
@@ -42,7 +35,7 @@ pub struct JsonWebTokenUtil {
 impl JsonWebTokenUtil {
     pub fn verify_auth_token(
         self: &JsonWebTokenUtil,
-        token_str: &str,
+        jwt_claims: &str,
         email: &str,
     ) -> Result<serde_json::value::Value, jsonwebtokens::error::Error> {
         let pem_data = &self.secrets.pub_key_pem_data[..];
@@ -54,7 +47,7 @@ impl JsonWebTokenUtil {
             .string_equals("email", email)
             .build()?;
 
-        verifier.verify(&token_str, &alg)
+        verifier.verify(&jwt_claims, &alg)
     }
 
     pub fn sign_auth_token(
@@ -70,14 +63,14 @@ impl JsonWebTokenUtil {
         let exp = now + twentyfour_hr_millis;
         let claims = json!({ "iss": &self.issuer, "exp": exp, "email": &email });
 
-        encode(&header, &claims, &alg)
+        // base64 websafe encode
+        jsonwebtokens::encode(&header, &claims, &alg)
     }
 
     pub fn verify_csrf_token(
         self: &JsonWebTokenUtil,
-        csrf_header_string: &str,
+        jwt_claims: &str,
         session_id: &str,
-        secrets: &ServerKeyring,
     ) -> Result<serde_json::value::Value, jsonwebtokens::error::Error> {
         let pem_data = &self.secrets.pub_key_pem_data[..];
 
@@ -86,20 +79,15 @@ impl JsonWebTokenUtil {
         let sid = Hasher::Blake2b512
             .digest(session_id.as_bytes())
             .expect("blake digest");
+
         let sid_hex = emoji::encode(sid.as_ref());
-
-        let message = UserEncryptedBase64Message {
-            message: csrf_header_string.to_owned(),
-        };
-
-        let decrypted = message.decrypt(&secrets.user_secret).expect("can decrypt csrf");
 
         let verifier = Verifier::create()
             .issuer(&self.issuer)
             .string_equals("sid", sid_hex)
             .build()?;
 
-        let res = verifier.verify(&decrypted, &alg)?;
+        let res = verifier.verify(&jwt_claims, &alg)?;
 
         Ok(res)
     }
@@ -107,7 +95,7 @@ impl JsonWebTokenUtil {
     pub fn sign_csrf_token(
         self: &JsonWebTokenUtil,
         session_id: &str,
-        keyring: &ServerKeyring,
+        keyring: &ClientServerKeyring,
     ) -> Result<String, jsonwebtokens::error::Error> {
         // use our secret key to sign some data for the client:
 
@@ -125,29 +113,25 @@ impl JsonWebTokenUtil {
 
         let sid_hex = emoji::encode(sid.as_ref());
 
-        let secret_slice = &emoji::EmojiCrypt::derive_session_secret(
+        let session_secret = EmojiCrypt::derive_session_secret(
             sid_hex.as_bytes().to_owned()
         );
 
-        let emoji_key = emoji::encode(secret_slice);
-
         // wire format for shared keyring
         let shared_keyring = TopSecretSharedKeyring {
-            a: keyring.broadcast.to_owned(),
-            b: keyring.user.to_owned(),
-            x: keyring.broadcast_secret.to_owned(),
-            y: keyring.user_secret.to_owned(),
+            a: keyring.server.sender_emoji_id.to_owned(),
+            b: keyring.client.sender_emoji_id.to_owned(),
+            x: emoji::encode(keyring.server.secret.as_slice()),
+            y: emoji::encode(keyring.client.secret.as_slice()),
         };
 
         let message = serde_json::to_string(&shared_keyring).expect("serialize");
 
-        let bytes = seal_with_key(&emoji_key, &message.as_bytes())
-            .expect("encrypted key ring");
+        let encrypted_bytes = EncryptionFunctions::seal(session_secret.as_slice(), message.as_bytes());
 
         let keyr = EncryptedKeyring {
-            b: emoji::encode(&bytes),
+            b: emoji::encode(encrypted_bytes.as_slice()),
         };
-
 
         let alg = Algorithm::new_rsa_pem_signer(AlgorithmID::RS256, pem_data)?;
         let header = json!({ "alg": alg.name() });
@@ -156,7 +140,8 @@ impl JsonWebTokenUtil {
         let exp = now + twentyfour_hr_millis;
         let claims = json!({ "iss": &self.issuer, "exp": exp, "sid": sid_hex, "keyring": keyr });
 
-        encode(&header, &claims, &alg)
+        // base64 websafe encode
+        jsonwebtokens::encode(&header, &claims, &alg)
     }
 }
 

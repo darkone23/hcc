@@ -11,7 +11,7 @@ pub async fn init_session_middleware(
 
     // async sessions: https://docs.rs/async-session/latest/async_session/
 
-    tide::log::info!("Connecting to postgres server ... for session storage");
+    tide::log::info!("Connecting to db... for session storage");
     
     let store = SqliteSessionStore::new(&config.sql_connection_url).await?;
 

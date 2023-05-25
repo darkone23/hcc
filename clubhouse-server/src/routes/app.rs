@@ -1,8 +1,10 @@
 use tide::{http::mime, Request, Response, Result, Redirect};
 
-use crate::util::encryption;
 use crate::wiring::ServerWiring;
 use domain::session::SessionUser;
+
+use clubhouse_core::encryption::EmojiCrypt;
+use clubhouse_core::shapes::ClientServerKeyring;
 
 use askama::Template; // bring trait in scope
 
@@ -18,14 +20,15 @@ pub async fn get(req: Request<ServerWiring>) -> Result {
     if maybe_user.is_some() {
         let user = maybe_user.unwrap().to_owned();
 
-        let secrets: &encryption::ServerKeyring = req.ext().unwrap();
+        let secrets: &ClientServerKeyring = req.ext().unwrap();
         
         let app_view = AppView { user };
 
-        let encrypted_body =secrets.encrypt_broadcast_emoji(&app_view.render().unwrap())
-            .await
-            .unwrap()
-            .message;
+        let encrypted_body =
+            EmojiCrypt::encrypt_emoji_server(
+                secrets,
+                &app_view.render().unwrap().as_bytes()
+            ).encrypted_message;
 
         let response = Response::builder(200)
             .content_type(mime::PLAIN)

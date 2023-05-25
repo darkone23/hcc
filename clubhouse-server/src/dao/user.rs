@@ -1,5 +1,6 @@
 use crate::wiring::ServerWiring;
-use clubhouse_core::encryption::DeterministicEmojiEncrypt;
+use clubhouse_core::checksum::EmojiHash;
+use clubhouse_core::shapes::EmojiCryptMessage;
 use domain::server_config::ServerConfig;
 
 use domain::sea_orm::entities::prelude::UserEmailPassword;
@@ -14,14 +15,9 @@ impl UserDao {
         wiring: &ServerWiring,
         email_plaintext_bytes: &[u8],
     ) -> Result<Option<user_email_password::Model>, ()> {
-        let email = DeterministicEmojiEncrypt::new(
-            &wiring.config.encryption_key_emoji,
-            &wiring.config.encryption_salt_emoji,
-            email_plaintext_bytes,
-        )
-        .unwrap();
-
-        let matches_email = user_email_password::Column::Email.eq(email.encrypted);
+        let email_hash: &str = &EmojiHash::digest(email_plaintext_bytes).encoded;
+            
+        let matches_email = user_email_password::Column::EmailHash.eq(email_hash);
 
         let res = UserEmailPassword::find()
             .filter(matches_email)
@@ -47,15 +43,15 @@ impl UserDao {
         } else {
             tide::log::info!("super user does not exist!");
 
-            let em = DeterministicEmojiEncrypt::new(
-                &config.encryption_key_emoji,
-                &config.encryption_salt_emoji,
-                plaintext_login,
-            )
-            .unwrap();
+            let emoji_key = &config.encryption_key_emoji;                
+            let emoji_secret = clubhouse_core::emoji::decode(emoji_key);
 
-            let encrypted_email = String::from(em.encrypted.clone());
-            let email_hash = String::from(em.encrypted.clone());
+            let hash: &str = &EmojiHash::digest(plaintext_login).encoded;
+            let encrypted = clubhouse_core::encryption::EncryptionFunctions::seal(&emoji_secret, plaintext_login);
+
+            let encrypted_email = String::from(clubhouse_core::emoji::encode(encrypted.as_slice()));
+            let email_hash = String::from(hash.clone());
+
             let encoded_hash = String::from(config.super_user_pwhash_emoji.clone());
 
             let s = user_email_password::ActiveModel {

@@ -2,7 +2,6 @@
 
 pub mod prelude;
 
-pub mod async_sessions;
 pub mod media_node;
 pub mod user_attributes;
 pub mod user_email_password;

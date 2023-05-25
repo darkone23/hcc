@@ -1,5 +1,6 @@
 use crate::wiring::ServerWiring;
-use clubhouse_core::encryption::{SharedKeyring, UserEncryptedBase64Message};
+use clubhouse_core::shapes::{ClientServerKeyring, EmojiCryptCodec, SenderType};
+use clubhouse_core::encryption::EmojiCrypt;
 use domain::session::SessionUser;
 
 #[derive(Default)]
@@ -20,7 +21,7 @@ impl tide::Middleware<ServerWiring> for UserAuthorizationMiddleware {
 
     // implements JWT authorization
 
-    // this middleware verifies the request has been signed by the user
+    // this middleware verifies the request has been encrypted by the user
     // expects the user to have identified the auth token we sent them
 
     async fn handle(
@@ -39,13 +40,12 @@ impl tide::Middleware<ServerWiring> for UserAuthorizationMiddleware {
                 if let Some(message) = maybe_header_value {
 
                     let jwt_util = &req.state().services.jwt_util;
-                    let secrets: &SharedKeyring = req.ext().unwrap();
+                    let secrets: &ClientServerKeyring = req.ext().unwrap();
 
-                    let message = UserEncryptedBase64Message { message: message.to_owned() };
+                    let decrypted = EmojiCrypt::decrypt(secrets, message, EmojiCryptCodec::Base64Websafe, SenderType::Client);
+                    let claims = String::from_utf8(decrypted).unwrap();
 
-                    let decrypted = message.decrypt(&secrets.user_secret).unwrap();
-
-                    let verification = jwt_util.verify_auth_token(&decrypted, &user.email);
+                    let verification = jwt_util.verify_auth_token(&claims, &user.email);
 
                     if verification.is_ok() {
                         Ok(next.run(req).await)

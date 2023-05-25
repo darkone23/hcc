@@ -1,9 +1,11 @@
 use tide::{http::mime, Request, Response, Result};
 
-use crate::util::encryption;
 use crate::wiring::ServerWiring;
 
 use askama::Template;
+
+use clubhouse_core::encryption::EmojiCrypt;
+use clubhouse_core::shapes::ClientServerKeyring;
 
 #[derive(Template)]
 #[template(path = "brand/header.html.j2")]
@@ -24,13 +26,13 @@ struct BrandFooterViewModel {}
 pub async fn get_header(req: Request<ServerWiring>) -> Result {
     let view_context = BrandHeaderViewModel {};
 
-    let secrets: &encryption::ServerKeyring = req.ext().unwrap();
+    let secrets: &ClientServerKeyring = req.ext().unwrap();
 
-    let encrypted_body = secrets
-        .encrypt_broadcast_emoji(&view_context.render().unwrap())
-        .await
-        .unwrap()
-        .message;
+    let encrypted_body =
+        EmojiCrypt::encrypt_emoji_server(
+            secrets,
+            &view_context.render().unwrap().as_bytes()
+        ).encrypted_message;
 
     let response = Response::builder(200)
         .content_type(mime::HTML)
@@ -43,13 +45,13 @@ pub async fn get_header(req: Request<ServerWiring>) -> Result {
 pub async fn get_sidebar(req: Request<ServerWiring>) -> Result {
     let view_context = BrandSidebarViewModel {};
 
-    let secrets: &encryption::ServerKeyring = req.ext().unwrap();
+    let secrets: &ClientServerKeyring = req.ext().unwrap();
 
-    let encrypted_body = secrets
-        .encrypt_broadcast_emoji(&view_context.render().unwrap())
-        .await
-        .unwrap()
-        .message;
+    let encrypted_body =
+        EmojiCrypt::encrypt_emoji_server(
+            secrets,
+            &view_context.render().unwrap().as_bytes()
+        ).encrypted_message;
 
     let response = Response::builder(200)
         .content_type(mime::HTML)
@@ -62,13 +64,13 @@ pub async fn get_sidebar(req: Request<ServerWiring>) -> Result {
 pub async fn get_splash(req: Request<ServerWiring>) -> Result {
     let view_context = BrandSplashViewModel {};
 
-    let secrets: &encryption::ServerKeyring = req.ext().unwrap();
+    let secrets: &ClientServerKeyring = req.ext().unwrap();
 
-    let encrypted_body = secrets
-        .encrypt_broadcast_emoji(&view_context.render().unwrap())
-        .await
-        .unwrap()
-        .message;
+    let encrypted_body =
+        EmojiCrypt::encrypt_emoji_server(
+            secrets,
+            &view_context.render().unwrap().as_bytes()
+        ).encrypted_message;
 
     let response = Response::builder(200)
         .content_type(mime::HTML)
@@ -81,13 +83,13 @@ pub async fn get_splash(req: Request<ServerWiring>) -> Result {
 pub async fn get_footer(req: Request<ServerWiring>) -> Result {
     let view_context = BrandFooterViewModel {};
 
-    let secrets: &encryption::ServerKeyring = req.ext().unwrap();
+    let secrets: &ClientServerKeyring = req.ext().unwrap();
 
-    let encrypted_body = secrets
-        .encrypt_broadcast_emoji(&view_context.render().unwrap())
-        .await
-        .unwrap()
-        .message;
+    let encrypted_body =
+        EmojiCrypt::encrypt_emoji_server(
+            secrets,
+            &view_context.render().unwrap().as_bytes()
+        ).encrypted_message;
 
     let response = Response::builder(200)
         .content_type(mime::HTML)

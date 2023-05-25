@@ -1,4 +1,8 @@
-use clubhouse_core::encryption::{EncryptedKeyring, SharedKeyring, TopSecretSharedKeyring};
+use clubhouse_core::base64;
+use clubhouse_core::encryption::EmojiCrypt;
+use clubhouse_core::shapes::{
+    ClientServerKeyring, EmojiCryptCodec, EncryptedKeyring, SenderType, TopSecretSharedKeyring,
+};
 use serde::{Deserialize, Serialize};
 
 use orion::aead;
@@ -26,8 +30,7 @@ struct JsonClaims {
 
 #[wasm_bindgen]
 pub struct ClientKeyring {
-    broadcast_secret: Vec<u8>,
-    user_secret: Vec<u8>,
+    __keyring: ClientServerKeyring,
 }
 
 #[wasm_bindgen]
@@ -37,35 +40,59 @@ impl ClientKeyring {
         let convert: TopSecretSharedKeyring =
             serde_wasm_bindgen::from_value(decrypted_secrets).unwrap();
 
-        ClientKeyring {
-            broadcast_secret: clubhouse_core::emoji::decode(&convert.x),
-            user_secret: clubhouse_core::emoji::decode(&convert.y),
-        }
+        let keyring = EmojiCrypt::decode_keyring(&convert);
+
+        ClientKeyring { __keyring: keyring }
     }
 
     pub fn decrypt(&self, encrypted: &str) -> String {
-        SharedKeyring::decrypt_emoji_from_slice(&self.broadcast_secret, encrypted)
+        let keyring = &self.__keyring;
+        let decrypted = EmojiCrypt::decrypt(
+            keyring,
+            encrypted,
+            EmojiCryptCodec::EmojiEncoded,
+            SenderType::Server,
+        );
+        String::from_utf8(decrypted).expect("invalid utf8")
     }
 
     pub fn encrypt(&self, plaintext: &str) -> String {
-        SharedKeyring::encrypt_emoji_from_slice(&self.user_secret, plaintext)
+        let keyring = &self.__keyring;
+
+        EmojiCrypt::encrypt(
+            keyring,
+            EmojiCryptCodec::EmojiEncoded,
+            SenderType::Client,
+            plaintext.as_bytes(),
+        )
+        .encrypted_message
     }
 
     pub fn handle_jwt_challenge(&self, header: &str) -> String {
-        let challenge =
-            SharedKeyring::decrypt_encoded_header_with_slice(&self.broadcast_secret, header);
+        let keyring = &self.__keyring;
 
-        SharedKeyring::encrypt_and_encode_header_with_slice(&self.user_secret, &challenge)
+        let decrypted = EmojiCrypt::decrypt(
+            keyring,
+            header,
+            EmojiCryptCodec::Base64Websafe,
+            SenderType::Server,
+        );
+
+        let response = EmojiCrypt::encrypt_base64websafe_client(keyring, decrypted.as_slice());
+
+        response.encrypted_message
     }
 
     pub fn handle_csrf_challenge(&self, csrf_token: &str) -> String {
-        SharedKeyring::encrypt_and_encode_header_with_slice(&self.user_secret, csrf_token)
+        let keyring = &self.__keyring;
+        let response = EmojiCrypt::encrypt_base64websafe_client(keyring, csrf_token.as_bytes());
+
+        response.encrypted_message
     }
 
     pub fn empty() -> ClientKeyring {
-        Self {
-            broadcast_secret: vec![],
-            user_secret: vec![],
+        ClientKeyring {
+            __keyring: ClientServerKeyring::empty(),
         }
     }
 }
@@ -82,7 +109,7 @@ fn decode_jwt_claims(jwt_payload: &str) -> JsonClaims {
     // decode jwt payload into parts
     let (_signature, message) = expect_two!(jwt_payload.rsplitn(2, '.'));
     let (_header, claims) = expect_two!(message.splitn(2, '.'));
-    let try_decode = base64::decode_config(claims, base64::URL_SAFE_NO_PAD).unwrap();
+    let try_decode = base64::decode_websafe(claims);
     let extracted_json = String::from_utf8(try_decode).unwrap();
     let decoded = parse(&extracted_json);
 
@@ -101,9 +128,7 @@ pub fn recv_claims(issuer: &str, csrf_signed: &str) -> JsValue {
     let claims_json = decode_jwt_claims(csrf_signed);
 
     if claims_json.iss == issuer {
-        let secret_slice = clubhouse_core::emoji::EmojiCrypt::derive_session_secret(
-            claims_json.sid.as_bytes().to_owned(),
-        );
+        let secret_slice = EmojiCrypt::derive_session_secret(claims_json.sid.as_bytes().to_owned());
 
         let message = clubhouse_core::emoji::decode(&claims_json.keyring.b);
 

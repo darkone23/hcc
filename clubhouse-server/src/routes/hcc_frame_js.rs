@@ -1,4 +1,6 @@
-use crate::{wiring::ServerWiring, util::encryption::ServerKeyring};
+use crate::wiring::ServerWiring;
+
+use clubhouse_core::shapes::ClientServerKeyring;
 
 use tide::{http::mime, Request, Response, Result};
 
@@ -23,7 +25,7 @@ pub async fn get(req: Request<ServerWiring>) -> Result {
 
     let session_id = req.session().id();
 
-    let secrets = req.ext::<ServerKeyring>().expect("do not have session secrets...");
+    let secrets = req.ext::<ClientServerKeyring>().expect("do not have session secrets...");
 
     let config = &req.state().config;
 

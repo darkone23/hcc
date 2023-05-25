@@ -18,7 +18,7 @@ module.exports = {
     './assets/**/*.html',
     './src/**/*.rs',
     './css/**/*.css',
-    '../clubhouse/templates/**/*.j2',
-    '../clubhouse/src/**/*.rs'
+    '../clubhouse-server/templates/**/*.j2',
+    '../clubhouse-server/src/**/*.rs'
   ],
 }

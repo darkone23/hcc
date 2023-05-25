@@ -655,7 +655,6 @@ dependencies = [
  "askama",
  "async-sqlx-session",
  "async-std",
- "base64",
  "bcrypt",
  "chrono",
  "clubhouse-core",

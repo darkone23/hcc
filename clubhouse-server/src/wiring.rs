@@ -35,8 +35,6 @@ impl ServerWiring {
                 .expect("Invalid configuration: HCC_SESSION_TTL_HOURS must be a number"),
             encryption_key_emoji: env::var("HCC_ENCRYPTION_KEY_EMOJI")
                 .expect("Invalid configuration: HCC_ENCRYPTION_KEY_EMOJI required"),
-            encryption_salt_emoji: env::var("HCC_ENCRYPTION_SALT_EMOJI")
-                .expect("Invalid configuration: HCC_ENCRYPTION_SALT_EMOJI required"),
             rsa_private_key_path: env::var("HCC_RSA_PRIVATE_KEY_PATH")
                 .expect("Invalid configuration: HCC_RSA_PRIVATE_KEY_PATH required"),
             rsa_public_key_path: env::var("HCC_RSA_PUBLIC_KEY_PATH")

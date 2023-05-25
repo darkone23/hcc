@@ -15,7 +15,7 @@ impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let sql = "\
         CREATE TABLE media_node ( \
-            id serial NOT NULL PRIMARY KEY, \
+            id integer NOT NULL PRIMARY KEY AUTOINCREMENT, \
             media_slug varchar NOT NULL UNIQUE, \
             medium_type integer NOT NULL, \
             sort_key integer NOT NULL, \
